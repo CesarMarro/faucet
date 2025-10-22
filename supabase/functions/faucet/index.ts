@@ -66,18 +66,19 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check if address has requested in the last 24 hours
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    
-    const { data: existingRequest, error: queryError } = await supabase
+    // Rate limit: compute remaining time and return waitSeconds if within 24h window
+    const nowMs = Date.now();
+    const windowMs = 24 * 60 * 60 * 1000;
+    const { data: lastReq, error: lastErr } = await supabase
       .from('faucet_requests')
       .select('*')
       .eq('address', address)
-      .gte('timestamp', twentyFourHoursAgo)
-      .single();
+      .order('timestamp', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (queryError && queryError.code !== 'PGRST116') {
-      console.error('Database query error:', queryError);
+    if (lastErr && lastErr.code !== 'PGRST116') {
+      console.error('Database query error:', lastErr);
       return new Response(JSON.stringify({ ok: false, error: 'Database error' }), {
         status: 500,
         headers: {
@@ -87,14 +88,23 @@ Deno.serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    if (existingRequest) {
-      return new Response(JSON.stringify({ ok: false, error: 'Ya solicitaste en las últimas 24h' }), {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
+    if (lastReq?.timestamp) {
+      const lastTsMs = new Date(lastReq.timestamp as string).getTime();
+      const elapsed = nowMs - lastTsMs;
+      if (elapsed < windowMs) {
+        const waitMs = windowMs - elapsed;
+        const waitSeconds = Math.ceil(waitMs / 1000);
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Ya solicitaste en las últimas 24h', waitSeconds }),
+          {
+            status: 429,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          }
+        );
+      }
     }
 
     // Get environment variables for blockchain interaction

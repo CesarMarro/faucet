@@ -7,7 +7,7 @@ import { Bloom, N8AO, SMAA, EffectComposer } from "@react-three/postprocessing";
 import { useRef } from "react";
 import { Mesh } from "three";
 import { KernelSize } from "postprocessing";
-import { Button } from "@/components/ui/button";
+import { FaucetForm } from "@/components/ui/faucet-form";
 
 function Shape() {
   const meshRef = useRef<Mesh>(null);
@@ -88,7 +88,7 @@ function Scene() {
 
 function Navbar({ links }: { links: Array<{ name: string; href: string }> }) {
   return (
-    <nav className="absolute top-4 left-4 right-4 md:top-10 md:left-10 md:right-10 z-30">
+    <nav className="absolute top-4 left-4 right-4 md:top-10 md:left-10 md:right-10 z-50 pointer-events-auto">
       <ul className="hidden md:flex gap-8 lg:gap-12">
         {links.map((link) => (
           <li key={link.name}>
@@ -126,15 +126,36 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ title, description, links }) => {
   return (
-    <div className="h-svh w-screen relative bg-[#0A0A0A]">
+    <div className="w-screen relative bg-[#0A0A0A] min-h-[100svh] md:min-h-[110svh]">
       <Navbar links={links} />
-      <div className="absolute inset-0">
+      {/* Créditos arriba a la derecha */}
+      <div className="absolute top-3 right-4 z-40 text-[11px] md:top-4 md:right-6 text-white/70">
+        César Marroquín · Daniel Hidalgo · Rodrigo Reyes
+      </div>
+      <div className="absolute inset-0 pointer-events-none">
         <Scene />
       </div>
-      {/* Texto original abajo a la izquierda */}
-      <div className="absolute bottom-4 left-4 md:bottom-10 md:left-10 z-20 max-w-md">
-        <h1 className="text-2xl md:text-3xl font-light tracking-tight mb-3 text-white">{title}</h1>
-        <p className="font-mono text-xs md:text-sm leading-relaxed font-light tracking-tight text-white/50">{description}</p>
+      {/* Overlay: formulario pegado a la izquierda, texto pegado a la derecha. Centro libre. */}
+      <div className="absolute inset-0 z-30 flex items-center justify-between px-4 md:px-10 py-16 pointer-events-none">
+        {/* Formulario (izquierda) */}
+        <div className="w-full max-w-[540px] pointer-events-auto">
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-5 md:p-6 backdrop-blur-2xl shadow-[0_8px_40px_rgba(255,255,255,0.08)] ring-1 ring-white/10 w-full">
+              <FaucetForm />
+              <div className="mt-3 flex flex-col gap-1 text-[11px] text-white/70 md:flex-row md:items-center md:justify-between">
+                <span>Máximo 0.01 Sepolia por billetera cada 24h</span>
+                <span className="text-white/60">Rate limit activo</span>
+              </div>
+            </div>
+        </div>
+        {/* Texto (derecha) */}
+        <div className="max-w-xl text-right pr-2 md:pr-4 pointer-events-auto">
+          <h1 className="text-3xl md:text-5xl font-light tracking-tight mb-4 text-white">
+              {title}
+          </h1>
+          <p className="font-mono text-sm md:text-base leading-relaxed font-light tracking-tight text-white/70">
+              {description}
+          </p>
+        </div>
       </div>
     </div>
   );

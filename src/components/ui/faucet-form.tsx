@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ethers } from "ethers";
+import { toast } from "sonner";
 
 interface FaucetFormProps {
   className?: string;
@@ -45,9 +46,32 @@ export function FaucetForm({ className }: FaucetFormProps) {
       if (data.ok) {
         setMessage("¡ETH enviado exitosamente!");
         setTxHash(data.txHash);
+        toast.success("ETH enviado", {
+          description: `TX ${data.txHash.slice(0, 10)}...${data.txHash.slice(-8)}`,
+          action: {
+            label: "Ver en Etherscan",
+            onClick: () => {
+              window.open(`https://sepolia.etherscan.io/tx/${data.txHash}`, "_blank");
+            },
+          },
+        });
         setAddress("");
       } else {
-        setMessage(data.error || "Error al enviar ETH");
+        if (response.status === 429 && typeof data.waitSeconds === "number") {
+          const s = data.waitSeconds;
+          const hours = Math.floor(s / 3600);
+          const minutes = Math.floor((s % 3600) / 60);
+          const seconds = s % 60;
+          const parts: string[] = [];
+          if (hours) parts.push(`${hours}h`);
+          if (minutes) parts.push(`${minutes}m`);
+          if (!hours && !minutes) parts.push(`${seconds}s`);
+          toast.error("Límite de 24h activo", { description: `Vuelve en ${parts.join(" ")}.` });
+          setMessage(`Debes esperar ${parts.join(" ")} para volver a solicitar.`);
+        } else {
+          toast.error("No se pudo enviar ETH", { description: data.error ?? "Inténtalo de nuevo" });
+          setMessage(data.error || "Error al enviar ETH");
+        }
       }
     } catch (error) {
       console.error("Error:", error);
