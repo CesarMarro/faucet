@@ -59,13 +59,13 @@ function Shape() {
 function Environment() {
   return (
     <>
-      {/* Luces movidas mucho más a la izquierda para acompañar el cubo */}
-      <directionalLight position={[-10, 7, -6]} intensity={0.4} color="#e6f3ff" />
-      <directionalLight position={[-6, -4, 8]} intensity={0.5} color="#fff5e6" />
-      <ambientLight intensity={0.65} color="#404040" />
-      <pointLight position={[-10, 3, 2]} intensity={0.45} color="#ccf0ff" distance={36} />
-      <pointLight position={[-14, 2, -8]} intensity={0.3} color="#ffeecc" distance={34} />
-      <directionalLight position={[-6, -10, 0]} intensity={0.22} color="#f0f0f0" />
+      {/* Luces originales */}
+      <directionalLight position={[-5, 5, -5]} intensity={0.2} color="#e6f3ff" />
+      <directionalLight position={[0, -5, 10]} intensity={0.4} color="#fff5e6" />
+      <ambientLight intensity={0.8} color="#404040" />
+      <pointLight position={[8, 3, 8]} intensity={0.2} color="#ffeecc" distance={20} />
+      <pointLight position={[-8, 3, -8]} intensity={0.2} color="#ccf0ff" distance={20} />
+      <directionalLight position={[0, -10, 0]} intensity={0.2} color="#f0f0f0" />
     </>
   );
 }
@@ -74,10 +74,8 @@ function Scene() {
   return (
     <Canvas className="w-full h-full" camera={{ position: [5, 5, 5], fov: 50 }}>
       <Environment />
-      {/* Mueve el objeto 3D aún más hacia la izquierda */}
-      <group position={[-7.5, -4, 1]}>
-        <Shape />
-      </group>
+      {/* Objeto 3D centrado (implementación original) */}
+      <Shape />
       <EffectComposer multisampling={0}>
         <N8AO halfRes color="black" aoRadius={2} intensity={1} aoSamples={6} denoiseSamples={4} />
         <Bloom kernelSize={3} luminanceThreshold={0} luminanceSmoothing={0.4} intensity={0.6} />
@@ -133,37 +131,10 @@ export const Hero: React.FC<HeroProps> = ({ title, description, links }) => {
       <div className="absolute inset-0">
         <Scene />
       </div>
-      {/* Panel de formulario estilo liquid glass al lado derecho (ocupa la mitad en desktop) */}
-      <div id="request" className="absolute right-4 top-1/2 z-30 w-[min(92vw,560px)] -translate-y-1/2 md:right-10 md:w-1/2">
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-5 md:p-6 backdrop-blur-2xl shadow-[0_8px_40px_rgba(255,255,255,0.08)] ring-1 ring-white/10">
-          <h1 className="text-2xl md:text-3xl font-light tracking-tight mb-2 text-white">
-            {title}
-          </h1>
-          <p className="font-mono text-xs md:text-sm leading-relaxed font-light tracking-tight text-white/70">
-            {description}
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]">
-            <input
-              type="text"
-              placeholder="0x… tu dirección de wallet"
-              className="h-12 rounded-xl border border-white/15 bg-white/10 px-4 text-sm text-white outline-none ring-0 placeholder:text-white/60 backdrop-blur-xl focus:border-white/25"
-            />
-            <Button className="h-12 rounded-xl bg-white/15 text-white hover:bg-white/25">
-              Pedir Sepolia ETH
-            </Button>
-          </div>
-          <div className="mt-3 flex flex-col gap-1 text-[11px] text-white/70 md:flex-row md:items-center md:justify-between">
-            <span>Máximo 0.01 Sepolia por billetera cada 24h</span>
-            <span className="text-white/60">Rate limit activo</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Texto descriptivo al lado izquierdo */}
-      <div className="absolute left-4 bottom-6 z-20 max-w-xs md:left-10 md:bottom-10">
-        <p className="text-xs leading-relaxed text-white/70">
-          Faucet de Sepolia para developers. Obtén ETH de prueba para desplegar, testear y depurar smart contracts. Optimizado para velocidad y confiabilidad.
-        </p>
+      {/* Texto original abajo a la izquierda */}
+      <div className="absolute bottom-4 left-4 md:bottom-10 md:left-10 z-20 max-w-md">
+        <h1 className="text-2xl md:text-3xl font-light tracking-tight mb-3 text-white">{title}</h1>
+        <p className="font-mono text-xs md:text-sm leading-relaxed font-light tracking-tight text-white/50">{description}</p>
       </div>
     </div>
   );
