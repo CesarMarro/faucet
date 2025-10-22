@@ -102,7 +102,7 @@ function Navbar({ links }: { links: Array<{ name: string; href: string }> }) {
         ))}
       </ul>
 
-      <ul className="md:hidden flex flex-col gap-3 items-end">
+      <ul className="md:hidden flex flex-col gap-3 items-start">
         {links.map((link) => (
           <li key={link.name}>
             <a
@@ -135,26 +135,29 @@ export const Hero: React.FC<HeroProps> = ({ title, description, links }) => {
       <div className="absolute inset-0 pointer-events-none">
         <Scene />
       </div>
-      {/* Overlay: formulario pegado a la izquierda, texto pegado a la derecha. Centro libre. */}
-      <div className="absolute inset-0 z-30 flex items-center justify-between px-4 md:px-10 py-16 pointer-events-none">
-        {/* Formulario (izquierda) */}
-        <div className="w-full max-w-[540px] pointer-events-auto">
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-5 md:p-6 backdrop-blur-2xl shadow-[0_8px_40px_rgba(255,255,255,0.08)] ring-1 ring-white/10 w-full">
+      {/* Overlay responsive: en móvil texto arriba y formulario abajo (centro libre); en desktop texto derecha / formulario izquierda */}
+      <div className="absolute inset-0 z-30 px-4 md:px-10 py-16 pointer-events-none">
+        <div className="h-full flex flex-col justify-between md:grid md:grid-cols-2 md:items-center">
+          {/* Texto: arriba en móvil, derecha en desktop */}
+          <div className="order-1 md:order-2 max-w-xl text-right md:pr-0 md:justify-self-end md:ml-auto pointer-events-auto">
+            <h1 className="text-3xl md:text-5xl font-light tracking-tight mb-4 text-white">
+              {title}
+            </h1>
+            <p className="font-mono text-sm md:text-base leading-relaxed font-light tracking-tight text-white/70">
+              {description}
+            </p>
+          </div>
+
+          {/* Formulario: abajo en móvil, izquierda en desktop */}
+          <div className="order-2 md:order-1 w-full max-w-[540px] md:justify-self-start pointer-events-auto">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-5 md:p-6 backdrop-blur-2xl shadow-[0_8px_40px_rgba(255,255,255,0.08)] ring-1 ring-white/10 w-full">
               <FaucetForm />
               <div className="mt-3 flex flex-col gap-1 text-[11px] text-white/70 md:flex-row md:items-center md:justify-between">
                 <span>Máximo 0.01 Sepolia por billetera cada 24h</span>
                 <span className="text-white/60">Rate limit activo</span>
               </div>
             </div>
-        </div>
-        {/* Texto (derecha) */}
-        <div className="max-w-xl text-right pr-2 md:pr-4 pointer-events-auto">
-          <h1 className="text-3xl md:text-5xl font-light tracking-tight mb-4 text-white">
-              {title}
-          </h1>
-          <p className="font-mono text-sm md:text-base leading-relaxed font-light tracking-tight text-white/70">
-              {description}
-          </p>
+          </div>
         </div>
       </div>
     </div>
