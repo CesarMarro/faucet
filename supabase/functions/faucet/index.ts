@@ -98,11 +98,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
 
     // Get environment variables for blockchain interaction
-    const alchemyRpcUrl = Deno.env.get('ALCHEMY_RPC_URL');
+    const infuraRpcUrl = Deno.env.get('INFURA_RPC_URL');
     const faucetPrivateKey = Deno.env.get('FAUCET_PRIVATE_KEY');
 
-    if (!alchemyRpcUrl || !faucetPrivateKey) {
-      console.error('Missing environment variables: ALCHEMY_RPC_URL or FAUCET_PRIVATE_KEY');
+    if (!infuraRpcUrl || !faucetPrivateKey) {
+      console.error('Missing environment variables: INFURA_RPC_URL or FAUCET_PRIVATE_KEY');
       return new Response(JSON.stringify({ ok: false, error: 'Server configuration error' }), {
         status: 500,
         headers: {
@@ -113,7 +113,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
 
     // Create provider and wallet
-    const provider = new ethers.JsonRpcProvider(alchemyRpcUrl);
+    const provider = new ethers.JsonRpcProvider(infuraRpcUrl);
     const wallet = new ethers.Wallet(faucetPrivateKey, provider);
 
     // Check wallet balance
